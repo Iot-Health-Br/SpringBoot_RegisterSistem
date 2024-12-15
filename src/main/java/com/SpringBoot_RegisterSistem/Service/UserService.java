@@ -2,11 +2,12 @@ package com.SpringBoot_RegisterSistem.Service;
 
 import com.SpringBoot_RegisterSistem.DTO.UserDTO;
 import com.SpringBoot_RegisterSistem.Entity.User;
-import com.SpringBoot_RegisterSistem.Exception.EmailAlreadyExistsException;
+import com.SpringBoot_RegisterSistem.Exception.DataAlreadyExistsException;
 import com.SpringBoot_RegisterSistem.Exception.ResourceNotFoundException;
 import com.SpringBoot_RegisterSistem.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +17,25 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    //private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserDTO createUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyExistsException("Email já está em uso");
+        if (userRepository.existsByName(user.getName())) {
+            throw new DataAlreadyExistsException("Nome já cadastrado!");
+        }else if (userRepository.existsByCpf(user.getCpf())) {
+            throw new DataAlreadyExistsException("CPF já cadastrado!");
+        }else if (userRepository.existsByTelefone(user.getTelefone())) {
+            throw new DataAlreadyExistsException("Telefone já cadastrado!");
+        }else if (userRepository.existsByEmail(user.getEmail())) {
+            throw new DataAlreadyExistsException("Email já cadastrado!");
+        }else{
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            User savedUser = userRepository.save(user);
+            return convertToDTO(savedUser);
         }
-        //user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
     }
 
     public UserDTO getUserById(Long id) {
@@ -46,7 +56,7 @@ public class UserService {
 
         if (!user.getEmail().equals(userDetails.getEmail()) &&
                 userRepository.existsByEmail(userDetails.getEmail())) {
-            throw new EmailAlreadyExistsException("Email já está em uso");
+            throw new DataAlreadyExistsException("Email já está em uso");
         }
 
         userDetails.setId(id);

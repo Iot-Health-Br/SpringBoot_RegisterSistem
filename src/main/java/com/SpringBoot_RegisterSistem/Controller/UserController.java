@@ -3,7 +3,10 @@ package com.SpringBoot_RegisterSistem.Controller;
 import com.SpringBoot_RegisterSistem.DTO.UserDTO;
 import com.SpringBoot_RegisterSistem.Entity.User;
 import com.SpringBoot_RegisterSistem.Service.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +17,8 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
