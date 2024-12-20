@@ -107,4 +107,7 @@ public class User {
                 ", password='" + password + '\'' +
                 '}';
     }
+
+    @Version
+    private Long version;
 }

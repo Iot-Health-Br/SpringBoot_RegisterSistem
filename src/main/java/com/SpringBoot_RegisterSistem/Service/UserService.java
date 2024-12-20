@@ -2,12 +2,15 @@ package com.SpringBoot_RegisterSistem.Service;
 
 import com.SpringBoot_RegisterSistem.DTO.UserDTO;
 import com.SpringBoot_RegisterSistem.Entity.User;
+import com.SpringBoot_RegisterSistem.Exception.ConcurrencyException;
 import com.SpringBoot_RegisterSistem.Exception.DataAlreadyExistsException;
 import com.SpringBoot_RegisterSistem.Exception.ResourceNotFoundException;
 import com.SpringBoot_RegisterSistem.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +25,27 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+    @Transactional
     public UserDTO createUser(User user) {
-        if (userRepository.existsByName(user.getName())) {
-            throw new DataAlreadyExistsException("Nome já cadastrado!");
-        }else if (userRepository.existsByCpf(user.getCpf())) {
-            throw new DataAlreadyExistsException("CPF já cadastrado!");
-        }else if (userRepository.existsByTelefone(user.getTelefone())) {
-            throw new DataAlreadyExistsException("Telefone já cadastrado!");
-        }else if (userRepository.existsByEmail(user.getEmail())) {
-            throw new DataAlreadyExistsException("Email já cadastrado!");
-        }else{
+        try {
+            /*
+            if (userRepository.existsByName(user.getName())) {
+                throw new DataAlreadyExistsException("Nome já cadastrado!");
+            }else if (userRepository.existsByCpf(user.getCpf())) {
+                throw new DataAlreadyExistsException("CPF já cadastrado!");
+            }else if (userRepository.existsByTelefone(user.getTelefone())) {
+                throw new DataAlreadyExistsException("Telefone já cadastrado!");
+            }else if (userRepository.existsByEmail(user.getEmail())) {
+                throw new DataAlreadyExistsException("Email já cadastrado!");
+            }*/
+
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = userRepository.save(user);
             return convertToDTO(savedUser);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // Tenta novamente ou lança uma exceção personalizada
+            throw new ConcurrencyException("Erro de concorrência ao salvar usuário. Por favor, tente novamente.");
         }
     }
 
