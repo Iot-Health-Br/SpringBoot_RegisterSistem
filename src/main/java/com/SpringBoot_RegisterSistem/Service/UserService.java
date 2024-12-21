@@ -29,7 +29,7 @@ public class UserService {
     @Transactional
     public UserDTO createUser(User user) {
         try {
-            /*
+
             if (userRepository.existsByName(user.getName())) {
                 throw new DataAlreadyExistsException("Nome já cadastrado!");
             }else if (userRepository.existsByCpf(user.getCpf())) {
@@ -38,7 +38,7 @@ public class UserService {
                 throw new DataAlreadyExistsException("Telefone já cadastrado!");
             }else if (userRepository.existsByEmail(user.getEmail())) {
                 throw new DataAlreadyExistsException("Email já cadastrado!");
-            }*/
+            }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User savedUser = userRepository.save(user);
@@ -65,9 +65,29 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        if (!user.getEmail().equals(userDetails.getEmail()) &&
+        if (!user.getName().equals(userDetails.getName()) &&
+                userRepository.existsByName(userDetails.getName())) {
+            throw new DataAlreadyExistsException("Nome já está em uso");
+        }else if (!user.getCpf().equals(userDetails.getCpf()) &&
+                userRepository.existsByCpf(userDetails.getCpf())) {
+            throw new DataAlreadyExistsException("CPF já está em uso");
+        }else if (!user.getTelefone().equals(userDetails.getTelefone()) &&
+                userRepository.existsByTelefone(userDetails.getTelefone())) {
+            throw new DataAlreadyExistsException("Telefone já está em uso");
+        }else if (!user.getEmail().equals(userDetails.getEmail()) &&
                 userRepository.existsByEmail(userDetails.getEmail())) {
             throw new DataAlreadyExistsException("Email já está em uso");
+        }
+
+        // Mantém os dados originais se não for fornecido um novo
+        if (user.getName() == null || userDetails.getName().isEmpty()) {
+            userDetails.setName(user.getName());
+        }else if (user.getCpf() == null || userDetails.getCpf().isEmpty()) {
+            userDetails.setCpf(user.getCpf());
+        }else if (user.getTelefone() == null || userDetails.getTelefone().isEmpty()) {
+            userDetails.setTelefone(user.getTelefone());
+        }else if (user.getEmail() == null || userDetails.getEmail().isEmpty()) {
+            userDetails.setEmail(user.getEmail());
         }
 
         userDetails.setId(id);

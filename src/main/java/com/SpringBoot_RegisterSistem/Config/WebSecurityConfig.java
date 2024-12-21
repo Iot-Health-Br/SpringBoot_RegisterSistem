@@ -48,10 +48,16 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").permitAll()
 
                         // Swagger UI
+                        /*
                         .requestMatchers("/v3/api-docs").permitAll()
                         .requestMatchers("/swagger-ui").permitAll()
                         .requestMatchers("/swagger-resources").permitAll()
-                        .requestMatchers("/webjars").permitAll()
+                        .requestMatchers("/webjars").permitAll()*/
+
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
 
                         // Banco de Dados H2
                         .requestMatchers("/h2-console/**").permitAll()
