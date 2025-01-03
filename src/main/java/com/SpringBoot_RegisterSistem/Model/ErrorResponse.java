@@ -1,10 +1,15 @@
 package com.SpringBoot_RegisterSistem.Model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 public class ErrorResponse {
+    @Schema(description = "Data e Horário do Erro", example = "2025-01-03T153301")
     private LocalDateTime timestamp;
+    @Schema(description = "Código de erro", example = "404 Not Found")
     private int status;
+    @Schema(description = "Mensagem de erro", example = "Usuário não encontrado")
     private String message;
 
     public ErrorResponse() {
