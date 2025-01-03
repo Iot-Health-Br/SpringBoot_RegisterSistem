@@ -21,8 +21,9 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private static final String URL = "/api";
+    //private static final String URL = "/api";
 
+    /*
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -31,7 +32,7 @@ public class WebSecurityConfig {
         authenticationManager
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
-    }
+    }*/
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -62,7 +63,7 @@ public class WebSecurityConfig {
                         // Banco de Dados H2
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        .requestMatchers(URL + "/users").permitAll()
+                        //.requestMatchers(URL + "/users").permitAll()
 
                         .anyRequest().authenticated())
                 .headers(headers -> headers
